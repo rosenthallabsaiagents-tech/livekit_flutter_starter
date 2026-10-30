@@ -1,0 +1,35 @@
+# Codemagic — Jarvis iPhone build (Route A backup to GitHub Actions).
+# Unsigned release IPA for Sideloadly sideloading onto a physical iPhone.
+# Setup in Codemagic UI: sign up with GitHub -> Add application -> pick this
+# repo -> Start new build -> workflow "ios-unsigned". Free tier = 500
+# build-min/month on Apple silicon. Secrets needed: none (sandbox .env is
+# git-ignored; the app fetches its token at runtime from the sandbox server).
+workflows:
+  ios-unsigned:
+    name: iOS unsigned IPA (Sideloadly)
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      xcode: latest # newest SDK available on Codemagic; needs iOS 27 SDK for iPhone 14 / iOS 27.x
+      cocoapods: default
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Install CocoaPods dependencies
+        script: find . -name "Podfile" -execdir pod install \;
+      - name: Build unsigned iOS app and package IPA
+        script: |
+          set -e
+          flutter build ios --release --no-codesign \
+            --build-name="1.0.0" \
+            --build-number="$CM_BUILD_NUMBER"
+          APP="build/ios/iphoneos/Runner.app"
+          if [ ! -d "$APP" ]; then APP="build/ios/Release-iphoneos/Runner.app"; fi
+          if [ ! -d "$APP" ]; then echo "Runner.app not found." >&2; exit 1; fi
+          rm -rf Payload && mkdir -p Payload && cp -R "$APP" Payload/
+          mkdir -p build/ios/ipa_unsigned
+          zip -qr build/ios/ipa_unsigned/jarvis_unsigned.ipa Payload
+          rm -rf Payload
+    artifacts:
+      - build/ios/ipa_unsigned/jarvis_unsigned.ipa
