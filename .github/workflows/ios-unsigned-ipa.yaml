@@ -1,0 +1,53 @@
+name: iOS unsigned IPA (Route A — iPhone sideload)
+
+# Builds an UNSIGNED ipa for sideloading onto a physical iPhone with Sideloadly.
+# Trigger manually from the Actions tab, or on push to main.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-26
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pin newest Xcode with iOS 27 SDK (iPhone 14 / iOS 27.0.1 target).
+      # Verified 2026-10-30: Xcode 27.2 (27B52) is latest stable, iOS 27.2 SDK,
+      # requires macOS Tahoe 26.6+ (macos-26 runner). Deployment target iOS 15-27
+      # covers the iPhone 14.
+      - name: Select Xcode 27.2
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "27.2"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.47.9"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # assets/.env is git-ignored in the starter, so the sandbox ID + agent
+      # name must be injected from Actions secrets (repo Settings > Secrets and
+      # variables > Actions > New repository secret):
+      #   LIVEKIT_SANDBOX_ID, LIVEKIT_AGENT_NAME
+      - name: Write assets/.env from secrets
+        run: |
+          printf "LIVEKIT_SANDBOX_ID='%s'\nLIVEKIT_AGENT_NAME='%s'\n" \
+            "${{ secrets.LIVEKIT_SANDBOX_ID }}" \
+            "${{ secrets.LIVEKIT_AGENT_NAME }}" > assets/.env
+          grep -o "LIVEKIT_[A-Z_]*" assets/.env
+
+      - name: Build unsigned IPA
+        run: flutter build ipa --no-codesign --export-method ad-hoc
+
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-ios-unsigned
+          path: build/ios/ipa/*.ipa
