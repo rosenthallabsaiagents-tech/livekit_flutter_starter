@@ -14,6 +14,12 @@ workflows:
       xcode: latest # newest SDK available on Codemagic; needs iOS 27 SDK for iPhone 14 / iOS 27.x
       cocoapods: default
     scripts:
+      - name: Write sandbox config (git-ignored assets/.env)
+        script: |
+          : "${LIVEKIT_SANDBOX_ID:?Set in Codemagic app settings > Environment variables}"
+          : "${LIVEKIT_AGENT_NAME:?Set in Codemagic app settings > Environment variables}"
+          printf "LIVEKIT_SANDBOX_ID='%s'\nLIVEKIT_AGENT_NAME='%s'\n" \
+            "$LIVEKIT_SANDBOX_ID" "$LIVEKIT_AGENT_NAME" > assets/.env
       - name: Get Flutter packages
         script: flutter pub get
       - name: Install CocoaPods dependencies
