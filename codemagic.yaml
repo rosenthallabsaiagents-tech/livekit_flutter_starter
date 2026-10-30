@@ -10,6 +10,8 @@ workflows:
     max_build_duration: 120
     instance_type: mac_mini_m2
     environment:
+      groups:
+        - jarvis
       flutter: stable
       xcode: latest # newest SDK available on Codemagic; needs iOS 27 SDK for iPhone 14 / iOS 27.x
       cocoapods: default
