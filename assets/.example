@@ -3,3 +3,4 @@
 # Without it, the app connects to a default agent.
 LIVEKIT_SANDBOX_ID=''
 LIVEKIT_AGENT_NAME='my-agent'
+RECOVERY_HELP_API_URL=''

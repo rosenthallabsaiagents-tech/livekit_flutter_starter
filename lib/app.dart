@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'controllers/app_ctrl.dart';
 import 'screens/agent_screen.dart';
+import 'screens/recovery_help_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'ui/color_pallette.dart' show LKColorPaletteLight, LKColorPaletteDark;
 import 'widgets/app_layout_switcher.dart';
@@ -67,6 +68,10 @@ class VoiceAssistantApp extends StatelessWidget {
         child: components.SessionContext(
           session: appCtrl.session,
           child: MaterialApp(
+            navigatorKey: appCtrl.navigatorKey,
+            routes: {
+              '/recovery-help': (_) => RecoveryHelpScreen(appCtrl: appCtrl),
+            },
             title: 'Voice Assistant',
             theme: buildTheme(isLight: true),
             darkTheme: buildTheme(isLight: false),

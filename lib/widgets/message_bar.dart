@@ -42,6 +42,7 @@ class MessageBar extends StatelessWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final GestureTapCallback? onSendTap;
+  final GestureTapCallback? onImageTap;
   final bool isSendEnabled;
 
   const MessageBar({
@@ -50,6 +51,7 @@ class MessageBar extends StatelessWidget {
     this.focusNode,
     this.isSendEnabled = true,
     this.onSendTap,
+    this.onImageTap,
   });
 
   @override
@@ -64,6 +66,11 @@ class MessageBar extends StatelessWidget {
         ),
         child: Row(
           children: [
+            IconButton(
+              tooltip: 'Recovery Help Assignments',
+              onPressed: onImageTap,
+              icon: const Icon(Icons.photo_camera_outlined),
+            ),
             Expanded(
               child: TextField(
                 focusNode: focusNode,

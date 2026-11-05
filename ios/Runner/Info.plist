@@ -29,7 +29,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Voice Assistant uses your camera</string>
+	<string>Take worksheet photos for Recovery Help Assignments.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Select worksheet photos for Recovery Help Assignments.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Voice Assistant uses your microphone</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

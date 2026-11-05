@@ -11,6 +11,7 @@ import '../widgets/agent_layout_switcher.dart';
 import '../widgets/agent_status_indicator.dart';
 import '../widgets/camera_toggle_button.dart';
 import '../widgets/message_bar.dart';
+import 'recovery_help_screen.dart';
 
 class AgentTrackView extends StatelessWidget {
   const AgentTrackView({super.key});
@@ -204,6 +205,11 @@ class AgentScreen extends StatelessWidget {
                   isSendEnabled: isSendEnabled,
                   controller: ctx.read<AppCtrl>().messageCtrl,
                   onSendTap: () => ctx.read<AppCtrl>().sendMessage(),
+                  onImageTap: () => Navigator.of(ctx).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => RecoveryHelpScreen(appCtrl: ctx.read<AppCtrl>()),
+                    ),
+                  ),
                 ),
               ),
             ),

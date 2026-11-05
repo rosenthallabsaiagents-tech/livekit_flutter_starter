@@ -20,8 +20,8 @@ workflows:
         script: |
           : "${LIVEKIT_SANDBOX_ID:?Set in Codemagic app settings > Environment variables}"
           : "${LIVEKIT_AGENT_NAME:?Set in Codemagic app settings > Environment variables}"
-          printf "LIVEKIT_SANDBOX_ID='%s'\nLIVEKIT_AGENT_NAME='%s'\n" \
-            "$LIVEKIT_SANDBOX_ID" "$LIVEKIT_AGENT_NAME" > assets/.env
+          printf "LIVEKIT_SANDBOX_ID='%s'\nLIVEKIT_AGENT_NAME='%s'\nRECOVERY_HELP_API_URL='%s'\n" \
+            "$LIVEKIT_SANDBOX_ID" "$LIVEKIT_AGENT_NAME" "${RECOVERY_HELP_API_URL:-}" > assets/.env
       - name: Get Flutter packages
         script: flutter pub get
       - name: Install CocoaPods dependencies

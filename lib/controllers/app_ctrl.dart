@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -30,8 +31,11 @@ class AppCtrl extends ChangeNotifier {
   final messageFocusNode = FocusNode();
 
   late final sdk.Room room = sdk.Room(roomOptions: const sdk.RoomOptions(enableVisualizer: true));
+  final navigatorKey = GlobalKey<NavigatorState>();
   late final roomContext = components.RoomContext(room: room);
   late final sdk.Session session = _createSession(room: room);
+  late final sdk.EventsListener<sdk.RoomEvent> _roomListener = room.createListener()
+    ..on<sdk.DataReceivedEvent>(_handleRoomData);
 
   static sdk.Session _createSession({required sdk.Room room}) {
     // Development-only hardcoded credentials (optional).
@@ -89,6 +93,7 @@ class AppCtrl extends ChangeNotifier {
     });
 
     session.addListener(_handleSessionChange);
+    _roomListener;
   }
 
   Future<void> cleanUp() async {
@@ -96,6 +101,7 @@ class AppCtrl extends ChangeNotifier {
     _hasCleanedUp = true;
 
     session.removeListener(_handleSessionChange);
+    _roomListener.dispose();
     await session.dispose();
     await room.dispose();
     roomContext.dispose();
@@ -118,6 +124,28 @@ class AppCtrl extends ChangeNotifier {
 
     if (text.isEmpty) return;
     await session.sendText(text);
+  }
+
+  Future<bool> sendAssignmentContextToJarvis(String text) async {
+    if (session.connectionState != sdk.ConnectionState.connected || text.trim().isEmpty) {
+      return false;
+    }
+    agentScreenState = AgentScreenState.transcription;
+    notifyListeners();
+    await session.sendText(text);
+    return true;
+  }
+
+  void _handleRoomData(sdk.DataReceivedEvent event) {
+    if (event.topic != 'jarvis_command' || event.participant?.identity != room.agentParticipant?.identity) return;
+    try {
+      final command = jsonDecode(utf8.decode(event.data));
+      if (command is Map<String, dynamic> && command['action'] == 'open_recovery_assignments') {
+        navigatorKey.currentState?.pushNamed('/recovery-help');
+      }
+    } on FormatException {
+      _logger.fine('Ignored malformed Jarvis app command.');
+    }
   }
 
   void toggleUserCamera(components.MediaDeviceContext? deviceCtx) {

@@ -40,6 +40,12 @@ or modify `lib/controllers/app_ctrl.dart` to replace the `SandboxTokenSource` wi
 
 ## Feature overview
 
+### Recovery Help Assignments
+
+Say, “Jarvis, help me with my recovery assignment,” and Jarvis can open **Recovery Help Assignments** in the connected app. The app also has a camera button as a manual shortcut. Take or select worksheet photos, review the photo-sharing notice, and send them to the Gemini service. The service URL is injected into the iOS build by Codemagic as `RECOVERY_HELP_API_URL` (the HTTPS root URL, without `/api/coach`). Set it in Codemagic's environment variables after the Recovery Help backend has been hosted. Keep the Gemini API key on that server; never add it to this Flutter app or Codemagic's mobile bundle.
+
+After Gemini returns question-by-question guidance, **Discuss this with Jarvis** sends that text and the optional note to the already-connected LiveKit agent. The photo itself is not sent through LiveKit. The app asks the user to confirm before sending photos to Gemini and does not store selected photos after the screen closes.
+
 This starter app supports several features of the agents framework and is intended as a base you can adapt for your own use case.
 
 ### Text, video, and voice input
